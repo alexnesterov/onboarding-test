@@ -1,5 +1,8 @@
+import { Suspense, lazy } from 'react'
+
 import Illustration from '@/assets/illustration.svg'
-import { BoardCard } from '@/components/Board'
+
+const BoardButtons = lazy(() => import('@/components/Boards/BoardButtons'))
 
 function App() {
   return (
@@ -26,32 +29,28 @@ function App() {
             </div>
             <div className="mt-16 flex justify-center gap-8">
               <div className="max-w-[300px] flex-1">
-                <BoardCard
-                  heading="Создай свой дизайн"
-                  text="Для этой модели доступно еще 62 варианта обивки и 5 опций"
-                  buttonText="Понял принял"
+                <button
+                  className="w-full rounded bg-lightGray px-[30px] py-[15px] text-center font-bold"
+                  data-board="button-1"
                 >
-                  <button className="w-full rounded bg-lightGray px-[30px] py-[15px] text-center font-bold">
-                    Изменить конфигурацию
-                  </button>
-                </BoardCard>
+                  Изменить конфигурацию
+                </button>
               </div>
               <div className="max-w-[300px] flex-1">
-                <BoardCard
-                  heading="Все и сразу!"
-                  text="Купи уже готовый диван и не парься ни с какими конструкторами"
-                  buttonText="Спасибо пожалуйста"
+                <button
+                  className="w-full rounded bg-grafit px-[30px] py-[15px] text-center font-bold text-white"
+                  data-board="button-2"
                 >
-                  <button className="w-full rounded bg-grafit px-[30px] py-[15px] text-center font-bold text-white">
-                    Купить любой диван
-                  </button>
-                </BoardCard>
+                  Купить любой диван
+                </button>
               </div>
             </div>
           </div>
         </div>
       </section>
-      {/* <Board /> */}
+      <Suspense fallback={'Загрузка...'}>
+        <BoardButtons />
+      </Suspense>
     </>
   )
 }

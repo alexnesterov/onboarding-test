@@ -1,11 +1,34 @@
-import { useEffect, useState } from 'react'
+import { BoardCard } from './BoardCard'
+import { useBoard } from './hooks/useBoard'
+import { IBoardCard } from '@/components/Board/types'
 
-export const Board = () => {
-  const [activeCard, setActiveCard] = useState<number | null>(null)
+type BoardProps = {
+  name: string
+  cards: IBoardCard[]
+}
 
-  useEffect(() => {
-    setActiveCard(1)
-  }, [])
+export const Board = ({ name, cards }: BoardProps) => {
+  const {
+    card,
+    isBoardCompleted,
+    activeCard,
+    handleNextClick,
+    handleCloseClick,
+  } = useBoard(name, cards)
 
-  return <div>{activeCard} Board</div>
+  if (isBoardCompleted || isBoardCompleted === null) return null
+
+  return (
+    <BoardCard
+      key={card.selector}
+      selector={card.selector}
+      title={card.title}
+      text={card.text}
+      buttonText={card.buttonText}
+      currentCardIndex={activeCard}
+      totalCards={cards.length}
+      onNextButtonClick={handleNextClick}
+      onCloseButtonClick={handleCloseClick}
+    />
+  )
 }

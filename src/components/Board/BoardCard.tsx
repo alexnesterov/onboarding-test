@@ -1,75 +1,51 @@
-import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { usePopper } from 'react-popper'
 import { CloseIcon } from '@/components/icons/CloseIcon'
+import { useBoardCard } from './hooks/useBoardCard'
+import { IBoardCard } from '@/components/Board/types'
 
-type BoardCardProps = {
-  heading?: string
-  text?: string
-  buttonText?: string
-  children?: React.ReactNode
+type BoardCardProps = IBoardCard & {
+  currentCardIndex: number
+  totalCards: number
+  onCloseButtonClick: () => void
+  onNextButtonClick: () => void
 }
 
 export const BoardCard = ({
-  heading,
+  selector,
+  title,
   text,
   buttonText,
-  children,
+  currentCardIndex,
+  totalCards,
+  onCloseButtonClick,
+  onNextButtonClick,
 }: BoardCardProps) => {
-  const [referenceElement, setReferenceElement] =
-    useState<HTMLDivElement | null>(null)
-  const [popperElement, setPopperElement] = useState<HTMLDivElement | null>(
-    null
-  )
+  const { anchor, refs, floatingStyles } = useBoardCard(selector)
 
-  const referenceElementRef = useRef<HTMLDivElement>(null)
-  const popperElementRef = useRef<HTMLDivElement>(null)
-  const { styles, attributes } = usePopper(referenceElement, popperElement, {
-    modifiers: [
-      {
-        name: 'offset',
-        options: {
-          offset: [0, 12],
-        },
-      },
-    ],
-  })
+  if (!anchor) return null
 
-  useEffect(() => {
-    setReferenceElement(referenceElementRef.current)
-    setPopperElement(popperElementRef.current)
-  }, [])
-
-  return (
-    <>
-      <div className="relative">
-        <div ref={referenceElementRef}>{children}</div>
-        <div
-          className="absolute -bottom-1 -left-1 -right-1 -top-1"
-          style={{ boxShadow: 'rgba(0, 0, 0, 0.3) 0 0 0 5000px' }}
-        />
+  return createPortal(
+    <div
+      className="absolute w-[315px] rounded bg-white p-5"
+      ref={refs.setFloating}
+      style={floatingStyles}
+    >
+      <div className="absolute right-5 top-5">
+        <button type="button" onClick={onCloseButtonClick}>
+          <CloseIcon />
+        </button>
       </div>
-      {createPortal(
-        <div
-          ref={popperElementRef}
-          style={styles.popper}
-          {...attributes.popper}
-          className="absolute w-[315px] rounded bg-white p-5"
-        >
-          <div className="absolute right-5 top-5">
-            <button type="button">
-              <CloseIcon />
-            </button>
-          </div>
-          <div className="text-lg font-bold">{heading}</div>
-          <div className="mt-3 text-sm">{text}</div>
-          <div className="mt-4 flex justify-between text-sm">
-            <button className="font-bold underline">{buttonText}</button>
-            <div className="text-darkGray">1/2</div>
-          </div>
-        </div>,
-        document.getElementById('board') as HTMLElement
-      )}
-    </>
+      <div className="text-lg font-bold">{title}</div>
+      <div className="mt-3 text-sm">{text}</div>
+      <div className="mt-4 flex justify-between text-sm">
+        <button className="font-bold underline" onClick={onNextButtonClick}>
+          {buttonText}
+        </button>
+        <div className="text-darkGray">
+          {currentCardIndex + 1}/{totalCards}
+        </div>
+      </div>
+    </div>,
+    document.getElementById('board') as HTMLElement
   )
 }
